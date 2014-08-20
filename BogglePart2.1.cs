@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,8 @@ using System.Text;
 //THIS VERSION OF BOGGLE, 2.1 HAS NO IF STATEMENTS AT THE BOTTOM, HAS METHODISED CURSOR SET AND RANDOM
 //next iteration has single array of all die. substring pulls letter from each element. then xferred to holding array, before being
 //put into position in 2d array.
+//version 2.1.4 update: Takes most of code from if userChoioe ==1 and adds it into a method.
+//version 2.1.5 update: improves code further and removes 1x set cursor method
 namespace Assignment
 {
     class Boggle
@@ -15,28 +18,66 @@ namespace Assignment
         static int wordListCount = 0;
         static Random numGen1 = new Random();//this num gen is used for the array, 1, 7
         static Random numGen2 = new Random();//this num gen is used for the grid posit, 1, 17
+        static string dieFace; //string which holds the letter from the die array.
+        //the array below used to be 16 arrays. now it's 1.
+        static string[] dies = new string[16] { "LRYTTE", "VTHRWE", "EGHWNE", "SEOTIS", "ANAEEG", "IDSYTT", "OATTOW", "MTOICU",
+                                            "AFPKFS", "XLDERI", "HCPOAS", "ENSIEU", "YLDEVR","ZNRNHL","NMIQHU","OBBAOJ"};
+        static string[] dieSides = new string[16];//holding array for all letters once taken from die.theyre then moved to boggleBoard[]
+        static string[] boggleBoard = new string[16];//this array is cut out. the number is out 
+        //finally create 2 x arrays to hold integers which will be the co-ordinates for the setCursor method. a nested
+        //loop will pass through the boggleBoard array, setting cursor positions
+        static int[] leftValue = new int[16] { 35, 38, 41, 44, 35, 38, 41, 44, 35, 38, 41, 44, 35, 38, 41, 44 };
+        static int[] topValue = new int[16] { 13, 13, 13, 13, 15, 15, 15, 15, 17, 17, 17, 17, 19, 19, 19, 19 };
+        static int leftP = 0;//left value array reference
+        static int topP = 0;//top value array reference
+        static int dieArrayLetter; //this is the updated number used, to load it to the correct position in the array
+        static int dieBoardPosition;
 
+        static void printBoggle()
+        {
+            Array.Clear(boggleBoard, 0, boggleBoard.Length);//clears any existing letters.
+            //the Array.Clear at the bottom of the while loop would remove any letters, making a good app have issues.
+
+            for (int i = 0; i < dies.Length; i++)
+            {
+                dieArrayLetter = gen1stNo(7);//calls numGen1. All the work is done inside the method. dieArrayLetter = return value
+                dieFace = dies[i].Substring(dieArrayLetter, 1);//this code gets the letter from the array element dies[i]
+                dieSides[i] = dieFace;
+                //Console.WriteLine(dieSides[i]);
+
+                dieBoardPosition = gen1stNo(17);
+                while (boggleBoard[dieBoardPosition] != null)
+                {
+                    dieBoardPosition = gen1stNo(17);
+                }
+                boggleBoard[dieBoardPosition] = dieSides[i];
+
+            }
+            //this loop recurse 16 times. the value of boggleBoard.Length, which is 16, which is also
+            //the number of numbers which need to be positioned. this loop increments 3x arrays simultaneously.
+            for (int i = 0; i < boggleBoard.Length; i++)//this does the same amount of work as 81 lines in my previous version
+            {
+                leftP = leftValue[i];
+                topP = topValue[i];
+                setCursor(leftP, topP);
+                Console.Write(boggleBoard[i]);
+            }
+            
+
+        }//this method is all the code which was if userChoice ==1
         static void setCursor(int left, int top)
         {
             Console.SetCursorPosition(left, top);
         }//method to set the cursor position.
-        static int gen1stNo()//running number gen for 1,7
+        static int gen1stNo(int maxValue)//running number gen for 1,7 for the letter from the die, then 1,17 for position on grid.
         {
             int roll;//contains the initial roll of the number gen
             int dieRollUpdate;//contains the updated value
-            roll = numGen1.Next(1, 7);//uses the global Random generator of numGen1, to gen a no. between 1 & 7
+            roll = numGen1.Next(1,(maxValue));//uses the global Random generator of numGen1, to gen a no. between 1 & 7, then 1,17
             dieRollUpdate = roll - 1;
             return dieRollUpdate;//returns this value. this is the value that is evaluated, then re-rolled if needed.
         }
-        static int gen2ndNo()//running number gen for 1,17
-        {
-            int roll;//contains the initial roll of the number gen
-            int dieRollUpdate;//contains the updated value
-            roll = numGen1.Next(1, 17);//uses the global Random generator of numGen1, to gen a no. between 1 & 17
-            dieRollUpdate = roll - 1;
-            return dieRollUpdate;//returns this value. this is the value that is evaluated, then re-rolled if needed.
-        }
-
+       
         static void LoadWordList()
         {
             StreamReader wordFile;
@@ -136,40 +177,24 @@ namespace Assignment
         {
            
             LoadWordList();//initialize LoadWordList method.
-            string dieFace; //string which holds the letter from the die array.
-            //the array below used to be 16 arrays. now it's 1.
-            string[] dies = new string[16] { "LRYTTE", "VTHRWE", "EGHWNE", "SEOTIS", "ANAEEG", "IDSYTT", "OATTOW", "MTOICU",
-                                            "AFPKFS", "XLDERI", "HCPOAS", "ENSIEU", "YLDEVR","ZNRNHL","NMIQHU","OBBAOJ"};
-
-            string[] dieSides = new string[16];//holding array for all letters once taken from die.theyre then moved to boggleBoard[]
-            string[] boggleBoard = new string[16];//this array is cut out. the number is out 
-            //finally create 2 x arrays to hold integers which will be the co-ordinates for the setCursor method. a nested
-            //loop will pass through the boggleBoard array, setting cursor positions
-            int[]  leftValue = new int[16] {35, 38, 41, 44, 35, 38, 41, 44, 35, 38, 41, 44, 35, 38, 41, 44};
-            int[]  topValue = new int[16] { 13, 13, 13 ,13, 15, 15, 15, 15, 17, 17, 17, 17, 19, 19, 19, 19};
+           
 
             string wordInput;//word goes in here
             List<string> words = new List<string>();//this array will hold the contents of the user input. It will grow too.
-            int leftP = 0;//left value array reference
-            int topP = 0;//top value array reference
+            
 
             string userInput;//collects user input for choice of what to do
             int userChoice;//an integer used to TryParse and check for errors
             bool playBoggle;//variable used to confirm whether the user input is correct.
             //section below is used for RNG'ing the spacing in the boggleBoard array and each letter from the arrays.
             //this will later be translated into a method, to cut code down.           
-            int dieArrayLetter; //this is the updated number used, to load it to the correct position in the array
-            int dieBoardPosition;
+          
             //write the title of BOGGLE
             writeBoggle();            
             //read the user input. Options are presented in the boggle title.
             userInput = Console.ReadLine();
             //userChoice = int.Parse(userInput);
-
             playBoggle = false;//variable used to confirm whether the user input is correct.
-
-            //put this all in a while loop, to make it re-play if invalid value entered. So while userChoice != 4
-
             //TryParse to check user input is within valid range.
             if (int.TryParse(userInput, out userChoice))
             {
@@ -186,42 +211,14 @@ namespace Assignment
 
                     if (userChoice == 1)
                     {
-                        Array.Clear(boggleBoard, 0, boggleBoard.Length);//clears any existing letters.
-                        //the Array.Clear at the bottom of the while loop would remove any letters, making a good app have issues.
+                       
                         words.Clear();//clears the words list, removing previously entered words.
                         Console.Clear();//clears the console. This removes any rubbish
+                        writeBoggle(); 
                         Console.WriteLine("User Choice = " + userChoice);//carry out code 4
-                        boggleGrid();
+                        boggleGrid();                        
+                        printBoggle();
 
-
-                        //these two select the position of the letter in the array to take at random
-                        //dieRoll = diceGenerator1.Next(1, 7); OLD CODE 
-                        //dieArrayLetter = dieRoll - 1; OLD CODE
-
-                        for (int i = 0; i < dies.Length; i++)
-                        {
-                            dieArrayLetter = gen1stNo();//calls numGen1. All the work is done inside the method. dieArrayLetter = return value
-                            dieFace = dies[i].Substring(dieArrayLetter, 1);//this code gets the letter from the array element dies[i]
-                            dieSides[i] = dieFace;
-                            //Console.WriteLine(dieSides[i]);
-
-                            dieBoardPosition = gen2ndNo();
-                            while (boggleBoard[dieBoardPosition] != null)
-                            {
-                                dieBoardPosition = gen2ndNo();
-                            }
-                            boggleBoard[dieBoardPosition] = dieSides[i];
-
-                        }
-                        //this loop recurse 16 times. the value of boggleBoard.Length, which is 16, which is also
-                        //the number of numbers which need to be positioned. this loop increments 3x arrays simultaneously.
-                        for (int i = 0; i < boggleBoard.Length; i++)//this does the same amount of work as 81 lines in my previous version
-                        {
-                            leftP = leftValue[i];
-                            topP = topValue[i];
-                            setCursor(leftP, topP);
-                            Console.Write(boggleBoard[i]);
-                        }
                         Console.CursorLeft = 32;
                         Console.CursorTop = 30;
 
@@ -285,7 +282,8 @@ namespace Assignment
             Console.CursorTop = 35;
             Console.WriteLine("Fin...");
 
-
+            
         }
     }
 }
+
