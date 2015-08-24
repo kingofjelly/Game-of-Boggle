@@ -1,10 +1,3 @@
 Game-of-Boggle
 ==============
-This version, 2.1 is my most recent code for a game of boggle. It relies on a text file which isn't included in this
-repository, so you'll need to create one with the correct name.
-
-This version is >400 lines shorter than my first attempt, however still needs much changing.
-
-Any changes will be written at the top of the boggle.cs document from now on, along with being written here
-
-Code for my game of boggle
+Old code for boggle I found. Boggle Boggles Back will be it's successor. It will incorporate new skills i've learnt during this year of programming. This means enums, try catches, classes and hopefully part 3 crushed, along with implementation of a 2d array to hold the letters???? maybe!?
